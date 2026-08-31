@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block title %}Masuk · Portal ITSM{% endblock %}
+{% block content %}
+<section class="auth-card card">
+  <p class="eyebrow">PORTAL LAYANAN TI</p>
+  <h1>Selamat datang</h1>
+  <p class="muted">Masuk untuk membuat dan memantau tiket layanan.</p>
+  {% if form.errors %}<div class="message error">Nama pengguna atau kata sandi tidak sesuai.</div>{% endif %}
+  <form method="post" class="stack">{% csrf_token %}{{ form.as_p }}<button class="button" type="submit">Masuk</button></form>
+  <p class="auth-switch">Belum mempunyai akun? <a href="{% url 'tickets:register' %}">Buat akun baru</a></p>
+</section>
+{% endblock %}

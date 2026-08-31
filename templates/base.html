@@ -1,0 +1,60 @@
+{% load static %}
+<!doctype html>
+<html lang="id">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Portal ITSM{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+  <link rel="stylesheet" href="{% static 'css/notifications.css' %}">
+</head>
+
+<body>
+  <header class="site-header">
+    <a class="brand" href="{% url 'tickets:list' %}">
+      <img src="{% static 'images/logo_kejaksaan.png' %}" alt="logo kejaksaan " class="brand-logo">
+      <span> ITSM Kejaksaan Tinggi Kalimantan Selatan</span>
+    </a>
+    {% if user.is_authenticated %}
+    <nav>
+      <span class="nav-item user-name">
+        <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="12" cy="8" r="4"></circle>
+          <path d="M4 21a8 8 0 0 1 16 0"></path>
+        </svg>
+        {{ user.get_full_name|default:user.username }}
+      </span>
+      <a class="nav-item notification-link" href="{% url 'tickets:notifications' %}">
+        <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path>
+          <path d="M10 21h4"></path>
+        </svg>
+        Notifikasi{% if unread_notification_count %}<b class="notification-count">
+          {{ unread_notification_count }}</b>
+        {%endif %}
+      </a>
+      {% if user.is_superuser %}<a class="nav-item" href="{% url 'admin:index' %}">
+        <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 3 4 6v5c0 5 3.4 8.7 8 10 4.6-1.3 8-5 8-10V6l-8-3Z"></path>
+          <path d="m9 12 2 2 4-4"></path>
+        </svg>
+        Administrasi
+      </a>{% endif %}
+      <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="link-button nav-item">
+          <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M10 4H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h5"></path>
+            <path d="m16 16 4-4-4-4M20 12H9"></path>
+          </svg>
+          Keluar
+        </button></form>
+    </nav>
+    {% endif %}
+  </header>
+  <main class="container">
+    {% for message in messages %}<div class="message {{ message.tags }}">{{ message }}</div>{% endfor %}
+    {% block content %}{% endblock %}
+  </main>
+</body>
+
+</html>

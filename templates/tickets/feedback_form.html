@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}Feedback {{ ticket.ticket_number }}{% endblock %}
+{% block content %}
+<div class="narrow">
+  <a class="back" href="{% url 'tickets:detail' ticket.pk %}">← Kembali</a>
+  <div class="card">
+    <p class="eyebrow">KEPUASAN LAYANAN</p>
+    <h1>Beri feedback</h1>
+    <p class="muted">{{ ticket.ticket_number }} · {{ ticket.subject }}</p>
+    <p>Penilaian Anda membantu tim TI meningkatkan kualitas layanan.</p>
+    <form method="post" class="stack">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button class="button" type="submit">Kirim feedback</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

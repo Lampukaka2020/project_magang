@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}Notifikasi · Portal ITSM{% endblock %}
+{% block content %}
+<div class="page-heading">
+  <div><p class="eyebrow">AKTIVITAS</p><h1>Notifikasi</h1></div>
+  {% if unread_notification_count %}<form method="post" action="{% url 'tickets:notification_read_all' %}">{% csrf_token %}<button class="button secondary">Tandai semua dibaca</button></form>{% endif %}
+</div>
+<section class="card notification-list">
+  {% for notification in notifications %}
+    <form method="post" action="{% url 'tickets:notification_read' notification.pk %}">
+      {% csrf_token %}
+      <button class="notification-item {% if not notification.is_read %}unread{% endif %}" type="submit">
+        <span class="notification-dot"></span>
+        <span><strong>{{ notification.message }}</strong><small>{{ notification.created_at|timesince }} yang lalu</small></span>
+      </button>
+    </form>
+  {% empty %}<p class="empty">Belum ada notifikasi.</p>{% endfor %}
+</section>
+{% endblock %}

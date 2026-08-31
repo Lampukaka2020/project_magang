@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block title %}Buat Akun · Portal ITSM{% endblock %}
+{% block content %}
+<section class="auth-card card">
+  <p class="eyebrow">PENGGUNA BARU</p>
+  <h1>Buat akun</h1>
+  <p class="muted">Daftarkan akun untuk melaporkan problem atau gangguan TI.</p>
+  <form method="post" class="stack">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button class="button" type="submit">Daftar</button>
+  </form>
+  <p class="auth-switch">Sudah mempunyai akun? <a href="{% url 'login' %}">Masuk</a></p>
+</section>
+{% endblock %}

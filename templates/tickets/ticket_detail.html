@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% block title %}{{ ticket.ticket_number }} · Portal ITSM{% endblock %}
+{% block content %}
+<a class="back" href="{% url 'tickets:list' %}">← Kembali ke daftar</a>
+
+<div class="page-heading">
+  <div>
+    <p class="eyebrow">{{ ticket.ticket_number }}</p>
+    <h1>{{ ticket.subject }}</h1>
+  </div>
+  {% if user.is_staff %}
+    <a class="button" href="{% url 'tickets:update' ticket.pk %}">Perbarui penanganan</a>
+  {% endif %}
+</div>
+
+<div class="detail-grid">
+  <section class="card">
+    <h2>Detail laporan</h2>
+    <p class="description">{{ ticket.description|linebreaksbr }}</p>
+    {% if ticket.attachment %}<a href="{{ ticket.attachment.url }}">Lihat lampiran</a>{% endif %}
+  </section>
+  <aside class="card metadata">
+    <h2>Informasi</h2>
+    <dl>
+      <dt>Status</dt>
+      <dd><span class="badge status-{{ ticket.status|lower }}">{{ ticket.get_status_display }}</span></dd>
+      <dt>Prioritas</dt><dd>{{ ticket.get_priority_display }}</dd>
+      <dt>Kategori</dt><dd>{{ ticket.category }}</dd>
+      <dt>Pelapor</dt><dd>{{ ticket.reporter.get_full_name|default:ticket.reporter.username }}</dd>
+      <dt>Dibuat</dt><dd>{{ ticket.created_at|date:'d M Y H:i' }}</dd>
+    </dl>
+  </aside>
+</div>
+
+<section class="card timeline">
+  <h2>Riwayat penanganan</h2>
+  {% for log in ticket.logs.all %}
+    <article>
+      <div class="timeline-dot"></div>
+      <div>
+        <strong>{{ log.actor.get_full_name|default:log.actor.username }}</strong>
+        <time>{{ log.timestamp|date:'d M Y H:i' }}</time>
+        <p>{{ log.action_note }}</p>
+        {% if log.status_changed_to %}<small>Status → {{ log.get_status_changed_to_display }}</small>{% endif %}
+      </div>
+    </article>
+  {% empty %}<p class="muted">Belum ada catatan penanganan.</p>{% endfor %}
+</section>
+
+{% if ticket.status == 'RESOLVED' or ticket.status == 'CLOSED' %}
+  {% if ticket.feedback %}
+    <section class="card feedback-card">
+      <p class="eyebrow">KEPUASAN LAYANAN</p>
+      <h2>Feedback pengguna</h2>
+      <p class="rating" aria-label="{{ ticket.feedback.rating }} dari 5 bintang">
+        {% for value, label in ticket.feedback.RATING_CHOICES %}{% if value <= ticket.feedback.rating %}★{% else %}☆{% endif %}{% endfor %}
+        <small>{{ ticket.feedback.rating }}/5</small>
+      </p>
+      <p>{{ ticket.feedback.comments|default:'Tanpa komentar.' }}</p>
+      <small>Dikirim {{ ticket.feedback.created_at|date:'d M Y H:i' }}</small>
+    </section>
+  {% elif not user.is_staff %}
+    <section class="card feedback-callout">
+      <div>
+        <p class="eyebrow">TIKET SELESAI</p>
+        <h2>Bagaimana layanan kami?</h2>
+        <p class="muted">Berikan penilaian untuk membantu kami meningkatkan layanan TI.</p>
+      </div>
+      <a class="button" href="{% url 'tickets:feedback' ticket.pk %}">Beri feedback</a>
+    </section>
+  {% endif %}
+{% endif %}
+{% endblock %}
